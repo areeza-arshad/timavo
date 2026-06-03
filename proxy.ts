@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   //Public routes (no authentication needed)
-  const publicRoutes = ['/login', '/signup', '/', '/shop', '/product', '/cart', '/affiliate', '/api'];
+  const publicRoutes = ['/login', '/signup', '/', '/shop', '/product', '/cart', '/affiliate', '/api', '/checkout'];
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
   
   if (isPublicRoute) {
