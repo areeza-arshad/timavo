@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700&family=Sacramento&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-cream text-dark font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+  
+  .font-cursive {
+    font-family: 'Sacramento', cursive;
+  }
+  
+  .heading-elegant {
+    font-family: 'Sacramento', cursive;
+    @apply text-gold;
+  }
+  
+  .heading-serif {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .heading-sans {
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl px-4 mx-auto md:px-0;
+  }
+  
+  .btn-primary {
+    @apply bg-gold text-dark px-8 py-3 rounded-none transition-all duration-300 font-medium tracking-wide;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-dark text-dark px-8 py-3 rounded-none hover:bg-dark hover:text-cream transition-all duration-300 font-medium tracking-wide;
+  }
+  
+  .btn-sand {
+    @apply bg-sand text-dark px-8 py-3 rounded-none hover:bg-gold hover:text-dark transition-all duration-300 font-medium tracking-wide;
+  }
+  
+  .btn-plaster {
+    @apply bg-plaster text-dark px-8 py-3 rounded-none hover:bg-gold hover:text-dark transition-all duration-300 font-medium tracking-wide;
+  }
+  
+  .section-title {
+    @apply text-4xl md:text-5xl font-serif font-light tracking-wide text-center mb-12;
+  }
+  
+  .section-title-cursive {
+    @apply text-5xl md:text-6xl font-cursive text-gold text-center mb-4;
+  }
+  
+  .section-subtitle {
+    @apply text-sm tracking-wider text-charcoal uppercase text-center mb-8;
+  }
+  
+  .card-sand {
+    @apply bg-sand rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .card-plaster {
+    @apply bg-plaster rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .card-white {
+    @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+}
+
+.scale-25 {
+  transform: scale(0.25);
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-700 {
+  transition-duration: 700ms;
+}
+
+.duration-500 {
+  transition-duration: 500ms;
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+img {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.modal-overlay {
+  z-index: 9999;
+}
+
+.modal-content {
+  z-index: 10000;
+}
+
+.product-card {
+  cursor: pointer;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.bg-section-sand {
+  background-color: #D7B691;
+}
+
+.bg-section-plaster {
+  background-color: #C69D81;
+}
+
+.bg-section-cream {
+  background-color: #FFF9F5;
+}
+
+.text-sand {
+  color: #D7B691;
+}
+
+.text-plaster {
+  color: #C69D81;
+}
+
+.border-sand {
+  border-color: #D7B691;
+}
+
+.border-plaster {
+  border-color: #C69D81;
+}
+
+.hover\:bg-sand:hover {
+  background-color: #D7B691;
+}
+
+.hover\:bg-plaster:hover {
+  background-color: #C69D81;
+}
+
+.hover\:text-sand:hover {
+  color: #D7B691;
+}
+
+.hover\:text-plaster:hover {
+  color: #C69D81;
+}
+
+:root {
+  --color-plaster: #C69D81;
+  --color-sand: #D7B691;
+  --color-gold: #C6A43B;
+  --color-dark: #2C2C2C;
+  --color-charcoal: #4A4A4A;
+  --color-cream: #FFF9F5;
+  --color-rose: #E8D5D5;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F0EB;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C6A43B;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2C2C2C;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #C6A43B #F5F0EB;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #C6A43B;
+  border-radius: 10px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #D7B691;
+}
+
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+}
