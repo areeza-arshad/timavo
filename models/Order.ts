@@ -18,10 +18,20 @@ const OrderSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
     image: { type: String, required: true },
+    selectedSize: { type: String, default: null },
   }],
+  
+  originalSubtotal: { type: Number, default: 0 },     
+  subtotal: { type: Number, required: true },         
+  discountAmount: { type: Number, default: 0 },       
+  discountPercent: { type: Number, default: 0 }, 
+  
+  codTax: { type: Number, default: 0 },
+  
   totalAmount: { type: Number, required: true },
   advanceAmount: { type: Number, required: true },
   remainingAmount: { type: Number, required: true },
+  
   paymentMethod: { 
     type: String, 
     enum: ['easypaisa', 'bank_transfer'], 
@@ -34,13 +44,8 @@ const OrderSchema = new mongoose.Schema({
   },
   transactionId: { type: String },
   paymentScreenshot: { type: String },
+  
   referralCode: { type: String },
-  commission: { type: Number },
-  status: { 
-    type: String, 
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], 
-    default: 'pending' 
-  },
   affiliateId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Affiliate' 
@@ -49,18 +54,28 @@ const OrderSchema = new mongoose.Schema({
     type: Number, 
     default: 0 
   },
+  commissionRateAtOrder: { 
+    type: Number, 
+    default: 9 
+  },
   commissionId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'AffiliateCommission' 
   },
-subtotal: { 
-  type: Number, 
-  required: true 
-},
-shippingCost: { 
-  type: Number, 
-  required: true 
-},
+  
+  shippingCost: { 
+    type: Number, 
+    required: true 
+  },
+  orderNote: { 
+    type: String, 
+    default: null 
+  },
+  status: { 
+    type: String, 
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], 
+    default: 'pending' 
+  },
 }, { 
   timestamps: true 
 });

@@ -5,12 +5,15 @@ import { useCartStore } from '@/store/cartStore';
 import toast from 'react-hot-toast';
 import { FULL_ADVANCE_THRESHOLD, SHIPPING_FEE } from '@/lib/constants';
 
+const COD_TAX = 100;
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'easypaisa' | 'bank_transfer'>('easypaisa');
+  const [paymentType, setPaymentType] = useState<'full_advance' | 'half_advance'>('half_advance');
   const [transactionId, setTransactionId] = useState('');
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState('');
@@ -18,23 +21,37 @@ export default function CheckoutPage() {
   const [referralCode, setReferralCode] = useState('');
   const [referralMessage, setReferralMessage] = useState('');
   const [isReferralValid, setIsReferralValid] = useState(false);
+  const [affiliateId, setAffiliateId] = useState('');
   const [orderNote, setOrderNote] = useState('');
   const [isHydrated, setIsHydrated] = useState(false);
   
-  const subtotal = getTotalPrice();
+  const originalSubtotal = getTotalPrice();
   const shippingFee = items.length === 0 ? 0 : SHIPPING_FEE;
-  const totalPrice = subtotal + shippingFee;
+  const originalTotal = originalSubtotal + shippingFee;
   
-  const requiresFullAdvance = totalPrice < FULL_ADVANCE_THRESHOLD;
-  const advancePercentage = requiresFullAdvance ? 1 : 0.5;
-  const advanceAmount = totalPrice * advancePercentage;
-  const remainingAmount = totalPrice - advanceAmount;
+  const discountAmount = isReferralValid ? originalSubtotal * 0.05 : 0;
+  const discountedSubtotal = originalSubtotal - discountAmount;
+  const discountedTotal = discountedSubtotal + shippingFee;
+
+  const isFullAdvance = paymentType === 'full_advance';
+  const codTax = isFullAdvance ? 0 : COD_TAX;
+  const totalWithTax = discountedTotal + codTax;
+
+  const advancePercentage = isFullAdvance ? 1 : 0.5;
+  const advanceAmount = discountedTotal * advancePercentage;
+  const remainingAmount = discountedTotal - advanceAmount + codTax;
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: '',
+    houseNo: '',
+    street: '',
+    block: '',
+    landmark: '',
+    area: '',
+    colonyRoad: '',
+    city: '',
   });
 
   useEffect(() => {
@@ -53,17 +70,20 @@ export default function CheckoutPage() {
       const res = await fetch(`/api/affiliates/validate?code=${code}`);
       const data = await res.json();
       if (data.valid) {
-        setReferralMessage('Referral code applied successfully!');
+        setReferralMessage(`Referral code applied!`);
         setIsReferralValid(true);
+        setAffiliateId(data.affiliateId || '');
         return true;
       } else {
         setReferralMessage('Invalid referral code');
         setIsReferralValid(false);
+        setAffiliateId('');
         return false;
       }
     } catch {
       setReferralMessage('Error validating code');
       setIsReferralValid(false);
+      setAffiliateId('');
       return false;
     }
   };
@@ -76,6 +96,7 @@ export default function CheckoutPage() {
     } else {
       setReferralMessage('');
       setIsReferralValid(false);
+      setAffiliateId('');
     }
   };
 
@@ -146,21 +167,44 @@ export default function CheckoutPage() {
         return;
       }
     }
+    
+    const commissionAmount = isReferralValid ? originalSubtotal * 0.09 : 0;
 
     const orderData = {
-      customer: formData,
+      customer: {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: `${formData.houseNo}, ${formData.street}, ${formData.block ? formData.block + ', ' : ''}${formData.area}, ${formData.colonyRoad}, ${formData.city}`,
+        houseNo: formData.houseNo,
+        street: formData.street,
+        block: formData.block,
+        landmark: formData.landmark,
+        area: formData.area,
+        colonyRoad: formData.colonyRoad,
+        city: formData.city,
+      },
       items: items.map(item => ({
         ...item,
         selectedSize: item.selectedSize || null,
       })),
       orderNote: orderNote,
-      totalAmount: totalPrice,
+      originalSubtotal: originalSubtotal,
+      subtotal: discountedSubtotal,
+      discountAmount: discountAmount,
+      discountPercent: isReferralValid ? 5 : 0,
+      codTax: codTax,
+      shippingCost: shippingFee,
+      totalAmount: totalWithTax,
       advanceAmount: advanceAmount,
       remainingAmount: remainingAmount,
       paymentMethod: paymentMethod,
+      paymentType: paymentType,
       transactionId: paymentMethod === 'easypaisa' ? transactionId : undefined,
       paymentScreenshot: screenshotUrl || undefined,
       referralCode: referralCode || undefined,
+      affiliateId: affiliateId || undefined,
+      commissionAmount: commissionAmount,
     };
 
     try {
@@ -187,7 +231,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0) {
+  if (!isHydrated || items.length === 0) {
     return null;
   }
 
@@ -196,10 +240,12 @@ export default function CheckoutPage() {
       <div className="container-custom">
         <h1 className="text-4xl text-gold font-serif text-center mb-12">Checkout</h1>
         <div className="grid lg:grid-cols-2 gap-12">
+          {/* Left Column - Form */}
           <div>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Customer Information */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">Full Name</label>
+                <label className="block text-sm text-charcoal mb-1">Full Name *</label>
                 <input
                   type="text"
                   required
@@ -210,7 +256,7 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Email</label>
+                <label className="block text-sm text-charcoal mb-1">Email *</label>
                 <input
                   type="email"
                   required
@@ -221,31 +267,103 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Phone</label>
+                <label className="block text-sm text-charcoal mb-1">Contact Number (Active on SIM) *</label>
                 <input
                   type="tel"
                   required
+                  placeholder="03XXXXXXXXX"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
 
+              {/* Address Fields */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">Delivery Address</label>
-                <textarea
+                <label className="block text-sm text-charcoal mb-1">House / Building / Apartment # *</label>
+                <input
+                  type="text"
                   required
-                  rows={3}
+                  placeholder="e.g., House # 123, 5th Floor"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  value={formData.houseNo}
+                  onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">
-                  Order Notes (Optional)
-                </label>
+                <label className="block text-sm text-charcoal mb-1">Street # *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Street 5, Main Road"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.street}
+                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Block / Sector</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Block A, Sector 15"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.block}
+                  onChange={(e) => setFormData({ ...formData, block: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Near any famous place (Landmark)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Near City Hospital, Opposite McDonald's"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.landmark}
+                  onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Area *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Gulshan-e-Iqbal, DHA, Model Town"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.area}
+                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Colony / Road / Chowk / Chowrangi *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Shahrah-e-Faisal, Askari Colony, FTC Chowrangi"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.colonyRoad}
+                  onChange={(e) => setFormData({ ...formData, colonyRoad: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Main City *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Karachi, Lahore, Islamabad"
+                  className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                />
+              </div>
+
+              {/* Order Notes */}
+              <div>
+                <label className="block text-sm text-charcoal mb-1">Order Notes (Optional)</label>
                 <textarea
                   rows={2}
                   placeholder="Any instructions for your order..."
@@ -254,14 +372,14 @@ export default function CheckoutPage() {
                   onChange={(e) => setOrderNote(e.target.value)}
                 />
               </div>
+
+              {/* Referral Code */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">
-                  Referral Code (Optional)
-                </label>
+                <label className="block text-sm text-charcoal mb-1">Referral Code (Get 5% OFF)</label>
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Enter referral code"
+                    placeholder="Enter referral code for 5% discount"
                     className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg uppercase"
                     value={referralCode}
                     onChange={(e) => handleReferralChange(e.target.value)}
@@ -287,8 +405,9 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* Online Payment Method */}
               <div>
-                <label className="block text-sm text-charcoal mb-3">Payment Method</label>
+                <label className="block text-sm text-charcoal mb-3">Online Payment Method</label>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
@@ -313,6 +432,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* Payment Details based on method */}
               {paymentMethod === 'easypaisa' && (
                 <div className="bg-gold/5 p-4 space-y-3 rounded-lg">
                   <p className="font-medium">Easypaisa Account Details:</p>
@@ -326,21 +446,12 @@ export default function CheckoutPage() {
                     onChange={(e) => setTransactionId(e.target.value)}
                     required
                   />
-
                   <div className="mt-3">
-                    <label className="block text-sm text-charcoal mb-2">
-                      Upload Payment Screenshot
-                    </label>
+                    <label className="block text-sm text-charcoal mb-2">Upload Payment Screenshot *</label>
                     <div className="flex items-center gap-4 flex-wrap">
                       <label className="cursor-pointer bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm hover:border-gold transition">
                         Choose File
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleScreenshotChange}
-                          className="hidden"
-                          
-                        />
+                        <input type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
                       </label>
                       {screenshotPreview ? (
                         <div className="relative">
@@ -361,12 +472,8 @@ export default function CheckoutPage() {
                         <div className="text-sm text-red-500">No file chosen</div>
                       )}
                     </div>
-                    {screenshotError && (
-                      <p className="text-xs text-red-500 mt-1">{screenshotError}</p>
-                    )}
-                    <p className="text-xs text-charcoal mt-2">
-                      Required: Upload screenshot of payment (JPEG, PNG, max 5MB)
-                    </p>
+                    {screenshotError && <p className="text-xs text-red-500 mt-1">{screenshotError}</p>}
+                    <p className="text-xs text-charcoal mt-2">Required: Upload screenshot of payment (JPEG, PNG, max 5MB)</p>
                   </div>
                 </div>
               )}
@@ -378,21 +485,12 @@ export default function CheckoutPage() {
                   <p className="text-sm">Account Name: Hafiza Fatima Murtaza</p>
                   <p className="text-sm">Account Number: 5010402491600014</p>
                   <p className="text-sm">IBAN: PK79BPUN5010402491600014</p>
-                  
                   <div className="mt-3">
-                    <label className="block text-sm text-charcoal mb-2">
-                      Upload Payment Screenshot
-                    </label>
+                    <label className="block text-sm text-charcoal mb-2">Upload Payment Screenshot *</label>
                     <div className="flex items-center gap-4 flex-wrap">
                       <label className="cursor-pointer bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm hover:border-gold transition">
                         Choose File
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleScreenshotChange}
-                          className="hidden"
-                          
-                        />
+                        <input type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
                       </label>
                       {screenshotPreview ? (
                         <div className="relative">
@@ -413,28 +511,59 @@ export default function CheckoutPage() {
                         <div className="text-sm text-red-500">No file chosen</div>
                       )}
                     </div>
-                    {screenshotError && (
-                      <p className="text-xs text-red-500 mt-1">{screenshotError}</p>
-                    )}
-                    <p className="text-xs text-charcoal mt-2">
-                      Required: Upload screenshot of payment (JPEG, PNG, max 5MB)
-                    </p>
+                    {screenshotError && <p className="text-xs text-red-500 mt-1">{screenshotError}</p>}
+                    <p className="text-xs text-charcoal mt-2">Required: Upload screenshot of payment (JPEG, PNG, max 5MB)</p>
                   </div>
                 </div>
               )}
 
-              <div className={`p-4 rounded-lg ${requiresFullAdvance ? 'bg-sand/30' : 'bg-gold/10'}`}>
+              {/* Payment Type Selection - Customer can choose */}
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">Choose Your Payment Plan</label>
+                <div className="space-y-3">
+                  <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${paymentType === 'full_advance' ? 'border-gold bg-gold/5' : 'border-sand/30'}`}>
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      checked={paymentType === 'full_advance'}
+                      onChange={() => setPaymentType('full_advance')}
+                      className="mt-1 text-gold"
+                    />
+                    <div>
+                      <p className="font-medium text-dark">100% Advance Payment</p>
+                      <p className="text-xs text-green-600">No extra tax • Pay full amount now</p>
+                    </div>
+                  </label>
+                  
+                  <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${paymentType === 'half_advance' ? 'border-gold bg-gold/5' : 'border-sand/30'}`}>
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      checked={paymentType === 'half_advance'}
+                      onChange={() => setPaymentType('half_advance')}
+                      className="mt-1 text-gold"
+                    />
+                    <div>
+                      <p className="font-medium text-dark">50% Advance + 50% Cash on Delivery</p>
+                      <p className="text-xs text-orange-600">Includes PKR {COD_TAX} Tax on delivery</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Info Note */}
+              <div className={`p-4 rounded-lg ${isFullAdvance ? 'bg-sand/60 border border-sand/30' : 'bg-gold/10 border border-gold/20'}`}>
                 <p className="text-sm font-medium mb-1">
-                  {requiresFullAdvance ? (
-                    <><span className="text-orange-700">Full Advance Required</span></>
+                  {isFullAdvance ? (
+                    <><span className="text-green-700">Full Advance Payment Selected</span></>
                   ) : (
-                    <><span className="text-gold">50% Advance + 50% Cash on Delivery</span></>
+                    <><span className="text-gold">Half Advance + Cash on Delivery Selected</span></>
                   )}
                 </p>
                 <p className="text-xs text-charcoal">
-                  {requiresFullAdvance 
-                    ? `Orders under PKR ${FULL_ADVANCE_THRESHOLD} require 100% advance payment.`
-                    : `Orders above PKR ${FULL_ADVANCE_THRESHOLD} require 50% advance online, remaining 50% on delivery.`}
+                  {isFullAdvance 
+                    ? `You have chosen 100% advance payment. No extra tax will be added. Pay PKR ${advanceAmount.toFixed(2)} now.`
+                    : `You have chosen 50% advance + 50% COD. Remaining PKR ${remainingAmount.toFixed(2)} (including PKR ${COD_TAX} tax) will be collected on delivery.`}
                 </p>
               </div>
 
@@ -448,20 +577,16 @@ export default function CheckoutPage() {
             </form>
           </div>
 
+          {/* Right Column - Order Summary */}
           <div>
             <div className="bg-sand/30 p-4 md:p-6 sticky top-32 rounded-2xl">
               <h2 className="text-xl font-serif mb-6">Order Summary</h2>
               <div className="space-y-4 mb-6">
                 {items.map((item, index) => (
-                  <div 
-                    key={`${item.productId}-${item.selectedSize || 'nosize'}-${index}`} 
-                    className="flex justify-between text-dark text-base"
-                  >
+                  <div key={`${item.productId}-${item.selectedSize || 'nosize'}-${index}`} className="flex justify-between text-dark text-base">
                     <div>
                       <span>{item.name} x {item.quantity}</span>
-                      {item.selectedSize && (
-                        <p className="text-xs text-gold">Size: {item.selectedSize}</p>
-                      )}
+                      {item.selectedSize && <p className="text-xs text-gold">Size: {item.selectedSize}</p>}
                     </div>
                     <span>PKR {(item.price * item.quantity).toFixed(2)}</span>
                   </div>
@@ -476,34 +601,57 @@ export default function CheckoutPage() {
               )}
 
               <div className="border-t border-sand/20 pt-4 space-y-2">
+                {isReferralValid && (
+                  <div className="flex justify-between text-sm text-gray-400 line-through">
+                    <span>Original Total</span>
+                    <span>PKR {originalTotal.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>PKR {subtotal.toFixed(2)}</span>
+                  <span>PKR {discountedSubtotal.toFixed(2)}</span>
                 </div>
+                
+                {isReferralValid && discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Referral Discount (5%)</span>
+                    <span>- PKR {discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span>PKR {shippingFee.toFixed(2)}</span>
                 </div>
+                
+                {!isFullAdvance && codTax > 0 && (
+                  <div className="flex justify-between text-orange-600">
+                    <span>COD Handling Fee</span>
+                    <span>PKR {codTax.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between pt-2 border-t border-sand/20">
                   <span>Total</span>
-                  <span>PKR {totalPrice.toFixed(2)}</span>
+                  <span>PKR {totalWithTax.toFixed(2)}</span>
                 </div>
-                <div className={`flex justify-between font-medium text-sm md:text-base pt-2 ${requiresFullAdvance ? 'text-orange-700' : 'text-gold'}`}>
-                  <span>Advance to Pay ({requiresFullAdvance ? '100%' : '50%'})</span>
-                  <span>PKR {advanceAmount.toFixed(2)}</span>
+                
+                <div className="flex justify-between font-medium text-sm pt-2">
+                  <span>Advance to Pay ({isFullAdvance ? '100%' : '50%'})</span>
+                  <span className="text-gold">PKR {advanceAmount.toFixed(2)}</span>
                 </div>
-                {!requiresFullAdvance && (
-                  <div className="flex justify-between text-xs md:text-sm text-charcoal">
-                    <span>Remaining (COD)</span>
+                
+                {!isFullAdvance && (
+                  <div className="flex justify-between text-xs text-charcoal">
+                    <span>Remaining (on delivery) {codTax > 0 && `(includes PKR ${codTax} tax)`}</span>
                     <span>PKR {remainingAmount.toFixed(2)}</span>
                   </div>
                 )}
               </div>
+              
               {isReferralValid && (
-                <div className="mt-3 p-2 bg-green-50 text-green-600 text-xs text-center rounded-lg flex items-center justify-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                <div className="mt-3 p-2 bg-green-50 text-green-600 text-xs text-center rounded-lg">
                   Affiliate code applied!
                 </div>
               )}

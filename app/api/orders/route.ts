@@ -33,7 +33,6 @@ export async function POST(request: Request) {
     await connectDB();
     const body = await request.json();
     
-    // Get current dynamic commission rate (e.g., 9, 12, 15 etc.)
     const commissionPercentage = await getCurrentCommissionRate();
     const COMMISSION_RATE = commissionPercentage / 100;
     
@@ -44,7 +43,10 @@ export async function POST(request: Request) {
     let affiliate = null;
     let commissionAmount = 0;
     
-    const subtotal = body.totalAmount - SHIPPING_FEE;
+    const originalSubtotal = body.originalSubtotal || (body.totalAmount - SHIPPING_FEE);
+    const discountedSubtotal = body.subtotal || (body.totalAmount - SHIPPING_FEE);
+    const discountAmount = body.discountAmount || 0;
+    const discountPercent = body.discountPercent || 0;
     
     const order = await Order.create({
       orderNumber,
@@ -62,7 +64,10 @@ export async function POST(request: Request) {
         image: item.image,
         selectedSize: item.selectedSize || null,
       })),
-      subtotal: subtotal,
+      originalSubtotal: originalSubtotal,
+      subtotal: discountedSubtotal,
+      discountAmount: discountAmount,
+      discountPercent: discountPercent,
       shippingCost: SHIPPING_FEE,
       totalAmount: body.totalAmount,
       advanceAmount: body.advanceAmount,
@@ -76,7 +81,7 @@ export async function POST(request: Request) {
       status: 'pending',
     });
     
-    // Find affiliate by referral code
+    // Find affiliate and calculate commission on ORIGINAL subtotal
     if (body.referralCode) {
       affiliate = await Affiliate.findOne({ 
         referralCode: body.referralCode.toUpperCase(),
@@ -84,9 +89,7 @@ export async function POST(request: Request) {
       });
       
       if (affiliate) {
-        commissionAmount = body.totalAmount * COMMISSION_RATE;
-        
-        console.log(` Affiliate found: ${affiliate.name}, Commission: ${commissionAmount} (${commissionPercentage}%)`);
+        commissionAmount = originalSubtotal * COMMISSION_RATE;
         
         await Affiliate.findByIdAndUpdate(affiliate._id, {
           $inc: { 
@@ -101,7 +104,7 @@ export async function POST(request: Request) {
           orderId: order._id,
           orderNumber: orderNumber,
           referralCode: body.referralCode.toUpperCase(),
-          orderSubtotal: body.totalAmount,
+          orderSubtotal: originalSubtotal, 
           commissionAmount: commissionAmount,
           commissionRate: commissionPercentage,
           status: 'pending',
@@ -117,7 +120,7 @@ export async function POST(request: Request) {
       }
     }
     
-
+    // Send emails
     try {
       await sendAdminOrderNotification(
         orderNumber,
@@ -152,7 +155,6 @@ export async function POST(request: Request) {
       } else {
         console.error('Failed to send customer email');
       }
-      
     } catch (emailError) {
       console.error('Customer email error:', emailError);
     }
@@ -162,7 +164,8 @@ export async function POST(request: Request) {
       orderId: order._id,
       orderNumber: order.orderNumber,
       commissionRate: commissionPercentage,
-      commissionAmount: commissionAmount
+      commissionAmount: commissionAmount,
+      discountApplied: discountAmount > 0
     });
   } catch (error) {
     console.error('Error creating order:', error);
@@ -172,7 +175,6 @@ export async function POST(request: Request) {
     );
   }
 }
-
 
 export async function PUT(request: Request) {
   try {

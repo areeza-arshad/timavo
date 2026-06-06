@@ -196,6 +196,19 @@ const fetchUser = async () => {
             </div>
 
             {/* Mobile Menu Button */}
+            <Link href="/cart" className="relative text-gold hover:text-gold/60 transition font-sans md:hidden">
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6M12 18v3" />
+              </svg>
+              {isClient && totalItems > 0 && (
+                <span 
+                  suppressHydrationWarning 
+                  className="absolute -top-1 -right-0 bg-sand text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center"
+                >
+                  {totalItems}
+                </span>
+              )}
+            </Link>
             <button onClick={() => handleMobileMenuToggle(!isMobileMenuOpen)} className="md:hidden">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />

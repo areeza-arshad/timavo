@@ -20,6 +20,9 @@ export async function GET(request: Request) {
     if (affiliate) {
       return NextResponse.json({ 
         valid: true, 
+        affiliateId: affiliate._id,        
+        discountPercent: 5,               
+        referralCode: affiliate.referralCode,
         affiliate: {
           id: affiliate._id,
           name: affiliate.name,

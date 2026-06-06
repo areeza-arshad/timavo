@@ -24,7 +24,10 @@ interface Order {
       images?: Array<{ url: string }>;
     };
   }>;
+  originalSubtotal?: number;
   subtotal: number;
+  discountAmount?: number;
+  discountPercent?: number;
   shippingCost: number;
   totalAmount: number;
   advanceAmount: number;
@@ -180,14 +183,30 @@ function OrderConfirmationContent() {
           </div>
 
           <div className="mt-4 pt-3 border-t border-sand/30">
+            {(order.originalSubtotal && order.originalSubtotal > 0) && (
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-charcoal">Original Subtotal</span>
+                <span className="text-dark">PKR {order.originalSubtotal.toLocaleString()}</span>
+              </div>
+            )}
+            
+            {(order.discountAmount && order.discountAmount > 0) && (
+              <div className="flex justify-between text-xs mb-1 text-green-600">
+                <span>Discount ({order.discountPercent}% OFF)</span>
+                <span>- PKR {order.discountAmount.toLocaleString()}</span>
+              </div>
+            )}
+            
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-charcoal">Subtotal</span>
-              <span className="text-dark">PKR {(order.subtotal || order.totalAmount - 250).toLocaleString()}</span>
+              <span className="text-charcoal">Subtotal after discount</span>
+              <span className="text-dark">PKR {(order.subtotal || order.totalAmount - (order.shippingCost || 250)).toLocaleString()}</span>
             </div>
+            
             <div className="flex justify-between text-xs mb-1">
               <span className="text-charcoal">Shipping</span>
               <span className="text-dark">PKR {(order.shippingCost || 250).toLocaleString()}</span>
             </div>
+            
             <div className="flex justify-between text-sm font-bold pt-2 border-t border-sand/30 mt-2">
               <span className="text-dark">Total</span>
               <span className="text-gold">PKR {order.totalAmount?.toLocaleString()}</span>
@@ -202,7 +221,7 @@ function OrderConfirmationContent() {
             </div>
             <div>
               <h3 className="text-xs font-serif font-medium text-dark uppercase tracking-wider mb-2">Shipping method</h3>
-              <p className="text-xs text-charcoal">Standard Shipping (2-3 business days)</p>
+              <p className="text-xs text-charcoal">Standard Shipping (5-7 business days)</p>
             </div>
             <div>
               <h3 className="text-xs font-serif font-medium text-dark uppercase tracking-wider mb-2">Payment method</h3>
