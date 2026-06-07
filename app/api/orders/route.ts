@@ -47,6 +47,9 @@ export async function POST(request: Request) {
     const discountedSubtotal = body.subtotal || (body.totalAmount - SHIPPING_FEE);
     const discountAmount = body.discountAmount || 0;
     const discountPercent = body.discountPercent || 0;
+
+    const codTax = body.codTax || 0;
+    const paymentType = body.paymentType || 'half_advance';
     
     const order = await Order.create({
       orderNumber,
@@ -68,6 +71,8 @@ export async function POST(request: Request) {
       subtotal: discountedSubtotal,
       discountAmount: discountAmount,
       discountPercent: discountPercent,
+      codTax: codTax,
+      paymentType: paymentType,
       shippingCost: SHIPPING_FEE,
       totalAmount: body.totalAmount,
       advanceAmount: body.advanceAmount,

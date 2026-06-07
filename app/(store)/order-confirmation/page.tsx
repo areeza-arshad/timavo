@@ -28,12 +28,14 @@ interface Order {
   subtotal: number;
   discountAmount?: number;
   discountPercent?: number;
+  codTax?: number;
   shippingCost: number;
   totalAmount: number;
   advanceAmount: number;
   remainingAmount: number;
   paymentMethod: string;
   paymentStatus: string;
+  paymentType?: string;
   orderNote?: string;
   createdAt: string;
 }
@@ -80,6 +82,14 @@ function OrderConfirmationContent() {
       if (res.ok) {
         const data = await res.json();
         setOrder(data);
+        console.log('📦 Order Data:', {
+          originalSubtotal: data.originalSubtotal,
+          subtotal: data.subtotal,
+          discountAmount: data.discountAmount,
+          discountPercent: data.discountPercent,
+          codTax: data.codTax,
+          totalAmount: data.totalAmount,
+        });
       }
     } catch (error) {
       console.error('Error fetching order:', error);
@@ -181,25 +191,29 @@ function OrderConfirmationContent() {
               })}
             </div>
           </div>
-
           <div className="mt-4 pt-3 border-t border-sand/30">
-            {(order.originalSubtotal && order.originalSubtotal > 0) && (
+            {(order.originalSubtotal && order.originalSubtotal > 0 && order.originalSubtotal !== order.subtotal) && (
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-charcoal">Original Subtotal</span>
                 <span className="text-dark">PKR {order.originalSubtotal.toLocaleString()}</span>
               </div>
             )}
             
-            {(order.discountAmount && order.discountAmount > 0) && (
+            {(order.discountAmount && order.discountAmount > 0) ? (
               <div className="flex justify-between text-xs mb-1 text-green-600">
                 <span>Discount ({order.discountPercent}% OFF)</span>
                 <span>- PKR {order.discountAmount.toLocaleString()}</span>
               </div>
+            ) : (
+              <div className="flex justify-between text-xs mb-1 text-gray-400">
+                <span>Discount</span>
+                <span>No discount applied</span>
+              </div>
             )}
             
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-charcoal">Subtotal after discount</span>
-              <span className="text-dark">PKR {(order.subtotal || order.totalAmount - (order.shippingCost || 250)).toLocaleString()}</span>
+              <span className="text-charcoal">Subtotal</span>
+              <span className="text-dark">PKR {order.subtotal.toLocaleString()}</span>
             </div>
             
             <div className="flex justify-between text-xs mb-1">
@@ -207,11 +221,23 @@ function OrderConfirmationContent() {
               <span className="text-dark">PKR {(order.shippingCost || 250).toLocaleString()}</span>
             </div>
             
+            {(order.codTax && order.codTax > 0) ? (
+              <div className="flex justify-between text-xs mb-1 text-orange-600">
+                <span>COD Handling Fee</span>
+                <span>PKR {order.codTax.toLocaleString()}</span>
+              </div>
+            ) : (
+              <div className="flex justify-between text-xs mb-1 text-gray-400">
+                <span>COD Handling Fee</span>
+                <span>No COD tax applied</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm font-bold pt-2 border-t border-sand/30 mt-2">
               <span className="text-dark">Total</span>
               <span className="text-gold">PKR {order.totalAmount?.toLocaleString()}</span>
             </div>
           </div>
+          
         </div>
         <div className="border border-sand/40 rounded-lg px-4 py-4 md:p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

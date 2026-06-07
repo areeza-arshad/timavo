@@ -64,6 +64,12 @@ export default function CheckoutPage() {
     }
   }, [isHydrated, items, router, orderPlaced]);
 
+  useEffect(() => {
+    if (discountedTotal < 1000) {
+      setPaymentType('full_advance');
+    }
+  }, [discountedTotal]);
+
   const validateReferralCode = async (code: string) => {
     if (!code) return false;
     try {
@@ -245,7 +251,7 @@ export default function CheckoutPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Customer Information */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">Full Name *</label>
+                <label className="block text-sm text-charcoal mb-1">Full Name</label>
                 <input
                   type="text"
                   required
@@ -256,7 +262,7 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Email *</label>
+                <label className="block text-sm text-charcoal mb-1">Email</label>
                 <input
                   type="email"
                   required
@@ -267,11 +273,10 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Contact Number (Active on SIM) *</label>
+                <label className="block text-sm text-charcoal mb-1">Contact Number (Active on SIM)</label>
                 <input
                   type="tel"
                   required
-                  placeholder="03XXXXXXXXX"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -280,11 +285,10 @@ export default function CheckoutPage() {
 
               {/* Address Fields */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">House / Building / Apartment # *</label>
+                <label className="block text-sm text-charcoal mb-1">House / Building / Apartment #</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., House # 123, 5th Floor"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.houseNo}
                   onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
@@ -292,11 +296,10 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Street # *</label>
+                <label className="block text-sm text-charcoal mb-1">Street #</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., Street 5, Main Road"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.street}
                   onChange={(e) => setFormData({ ...formData, street: e.target.value })}
@@ -307,7 +310,6 @@ export default function CheckoutPage() {
                 <label className="block text-sm text-charcoal mb-1">Block / Sector</label>
                 <input
                   type="text"
-                  placeholder="e.g., Block A, Sector 15"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.block}
                   onChange={(e) => setFormData({ ...formData, block: e.target.value })}
@@ -318,7 +320,6 @@ export default function CheckoutPage() {
                 <label className="block text-sm text-charcoal mb-1">Near any famous place (Landmark)</label>
                 <input
                   type="text"
-                  placeholder="e.g., Near City Hospital, Opposite McDonald's"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.landmark}
                   onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
@@ -326,11 +327,10 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Area *</label>
+                <label className="block text-sm text-charcoal mb-1">Area</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., Gulshan-e-Iqbal, DHA, Model Town"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.area}
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
@@ -338,11 +338,10 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Colony / Road / Chowk / Chowrangi *</label>
+                <label className="block text-sm text-charcoal mb-1">Colony / Road / Chowk / Chowrangi</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., Shahrah-e-Faisal, Askari Colony, FTC Chowrangi"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.colonyRoad}
                   onChange={(e) => setFormData({ ...formData, colonyRoad: e.target.value })}
@@ -350,11 +349,10 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-charcoal mb-1">Main City *</label>
+                <label className="block text-sm text-charcoal mb-1">Main City</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., Karachi, Lahore, Islamabad"
                   className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
@@ -375,11 +373,11 @@ export default function CheckoutPage() {
 
               {/* Referral Code */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">Referral Code (Get 5% OFF)</label>
+                <label className="block text-sm text-charcoal mb-1">Referral Code</label>
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Enter referral code for 5% discount"
+                    placeholder="Enter referral code"
                     className="w-full px-4 py-2 border border-gray-200 focus:border-gold outline-none rounded-lg uppercase"
                     value={referralCode}
                     onChange={(e) => handleReferralChange(e.target.value)}
@@ -516,7 +514,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               )}
-
               {/* Payment Type Selection - Customer can choose */}
               <div>
                 <label className="block text-sm font-medium text-charcoal mb-3">Choose Your Payment Plan</label>
@@ -535,24 +532,34 @@ export default function CheckoutPage() {
                     </div>
                   </label>
                   
-                  <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${paymentType === 'half_advance' ? 'border-gold bg-gold/5' : 'border-sand/30'}`}>
-                    <input
-                      type="radio"
-                      name="paymentType"
-                      checked={paymentType === 'half_advance'}
-                      onChange={() => setPaymentType('half_advance')}
-                      className="mt-1 text-gold"
-                    />
-                    <div>
-                      <p className="font-medium text-dark">50% Advance + 50% Cash on Delivery</p>
-                      <p className="text-xs text-orange-600">Includes PKR {COD_TAX} Tax on delivery</p>
+                  {discountedTotal >= 1000 && (
+                    <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${paymentType === 'half_advance' ? 'border-gold bg-gold/5' : 'border-sand/30'}`}>
+                      <input
+                        type="radio"
+                        name="paymentType"
+                        checked={paymentType === 'half_advance'}
+                        onChange={() => setPaymentType('half_advance')}
+                        className="mt-1 text-gold"
+                      />
+                      <div>
+                        <p className="font-medium text-dark">50% Advance + 50% Cash on Delivery</p>
+                        <p className="text-xs text-orange-600">Includes PKR {COD_TAX} Tax on delivery</p>
+                      </div>
+                    </label>
+                  )}
+                  
+                  {discountedTotal < 1000 && (
+                    <div className="p-3">
+                      <p className="text-xs text-blue-700">
+                        Orders under PKR 1000 require 100% advance payment. You can only choose the full advance option.
+                      </p>
                     </div>
-                  </label>
+                  )}
                 </div>
               </div>
 
               {/* Info Note */}
-              <div className={`p-4 rounded-lg ${isFullAdvance ? 'bg-sand/60 border border-sand/30' : 'bg-gold/10 border border-gold/20'}`}>
+              <div className={`p-4 rounded-lg ${isFullAdvance ? 'bg-sand/30 border border-sand/30' : 'bg-gold/10 border border-gold/20'}`}>
                 <p className="text-sm font-medium mb-1">
                   {isFullAdvance ? (
                     <><span className="text-green-700">Full Advance Payment Selected</span></>
@@ -614,20 +621,20 @@ export default function CheckoutPage() {
                 </div>
                 
                 {isReferralValid && discountAmount > 0 && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between text-green-600 text-xs md:text-base">
                     <span>Referral Discount (5%)</span>
                     <span>- PKR {discountAmount.toFixed(2)}</span>
                   </div>
                 )}
                 
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xs md:text-base">
                   <span>Shipping</span>
                   <span>PKR {shippingFee.toFixed(2)}</span>
                 </div>
                 
                 {!isFullAdvance && codTax > 0 && (
-                  <div className="flex justify-between text-orange-600">
-                    <span>COD Handling Fee</span>
+                  <div className="flex justify-between text-orange-600 text-xs md:text-base">
+                    <span>COD Tax</span>
                     <span>PKR {codTax.toFixed(2)}</span>
                   </div>
                 )}
@@ -643,15 +650,15 @@ export default function CheckoutPage() {
                 </div>
                 
                 {!isFullAdvance && (
-                  <div className="flex justify-between text-xs text-charcoal">
-                    <span>Remaining (on delivery) {codTax > 0 && `(includes PKR ${codTax} tax)`}</span>
-                    <span>PKR {remainingAmount.toFixed(2)}</span>
+                  <div className="flex justify-between gap-4 text-xs text-charcoal">
+                    <span>Remaining {codTax > 0 && `(includes PKR ${codTax} tax)`}</span>
+                    <span className='text-right flex gap-1'><span>PKR</span> {remainingAmount.toFixed(2)}</span>
                   </div>
                 )}
               </div>
               
               {isReferralValid && (
-                <div className="mt-3 p-2 bg-green-50 text-green-600 text-xs text-center rounded-lg">
+                <div className="mt-3 p-2 text-green-600 text-xs text-center rounded-lg">
                   Affiliate code applied!
                 </div>
               )}
