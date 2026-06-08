@@ -12,10 +12,10 @@ import {
   PenTool,
   LogOut,
   ShoppingCart,
-  MessagesSquare,
   Settings,
-  PercentIcon
+  PercentIcon,
 } from 'lucide-react';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 interface AdminSidebarProps {
   user: any;
@@ -39,8 +39,10 @@ export default function AdminSidebar({ user, onLogout }: AdminSidebarProps) {
     { name: 'Categories', path: '/admin/categories', icon: FolderTree },
     { name: 'Customizations', path: '/admin/customizations', icon: PenTool },
     { name: 'Reviews', path: '/admin/reviews', icon: Star },
+    { name: 'FAQs', path: '/admin/faqs', icon: QuestionMarkCircleIcon },
     { name: 'Sales', path: '/admin/sales', icon: PercentIcon },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
+
   ];
 
   const isActive = (path: string) => {

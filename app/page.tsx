@@ -1,7 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import BraceletSection from '@/components/BraceletSection';
 import CategoriesSection from '@/components/CategoriesSection';
@@ -9,6 +7,7 @@ import ReviewSection from '@/components/ReviewSection';
 import CustomizePromo from '@/components/CustomizePromo';
 import AffiliatePromo from '@/components/AffiliatePromo';
 import AboutPage from '@/components/AboutPage';
+import FAQSection from '@/components/FAQSection';
 
 interface Product {
   _id: string;
@@ -56,12 +55,13 @@ export default function HomePage() {
 
   return (
     <div className="overflow-hidden">
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
         <img
           src="/bg.jpeg"
           alt="Hero"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-fill md:object-cover "
         />
+        
         <div className="absolute inset-0 bg-dark/60" />
       </section>
 
@@ -82,6 +82,8 @@ export default function HomePage() {
       <AboutPage/>
 
       <ReviewSection />
+
+      <FAQSection/>
 
       <CustomizePromo />
     </div>
