@@ -13,7 +13,7 @@ import {
 
 export default function AffiliatePromo() {
   return (
-    <section className="py-20 bg-sand overflow-hidden">
+    <section className="py-8 bg-sand overflow-hidden">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -51,7 +51,7 @@ export default function AffiliatePromo() {
             ✨
           </motion.div>
 
-          <div className="relative z-10 px-6 py-16 md:py-20 md:px-12">
+          <div className="relative z-10 px-6 py-8 md:py-20 md:px-12">
             <div className="text-center max-w-3xl mx-auto">
               
               <motion.div

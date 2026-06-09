@@ -25,7 +25,7 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="bg-cream border-t overflow-hidden pt-10 pb-24">
+    <div className="bg-cream border-t overflow-hidden pt-10 pb-10">
       <div className="container-custom">
         <motion.div
           initial="hidden"
@@ -111,36 +111,6 @@ export default function AboutPage() {
                 <p className="text-charcoal text-xs uppercase tracking-wide">{stat.label}</p>
               </motion.div>
             ))}
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-rose/30 via-sand/20 to-plaster/30 rounded-3xl p-8 md:p-12 text-center"
-        >
-          <h2 className="font-serif text-2xl md:text-3xl text-dark mb-3">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-charcoal mb-6 max-w-md mx-auto">
-            Explore our collection and find the piece that speaks to your soul.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 bg-gold text-dark px-6 py-3 rounded-full hover:bg-gold/80 transition group"
-            >
-              <span>Shop Now</span>
-              <ArrowRightIcon className="h-4 w-4 group-hover:translate-x-1 transition" />
-            </Link>
-            <Link
-              href="/customize"
-              className="inline-flex items-center gap-2 border border-dark text-dark px-6 py-3 rounded-full hover:bg-dark hover:text-cream transition group"
-            >
-              <span>Custom Design</span>
-              <SparklesIcon className="h-4 w-4" />
-            </Link>
           </div>
         </motion.div>
       </div>

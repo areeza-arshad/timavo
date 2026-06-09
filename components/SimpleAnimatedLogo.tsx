@@ -69,17 +69,17 @@ export default function SimpleAnimatedLogo() {
         className={`fixed z-40 transition-all duration-700 ease-out pointer-events-none
           ${scrolled 
             ? 'opacity-0 scale-25 top-6 left-6 -translate-x-0 -translate-y-0' 
-            : 'opacity-100 scale-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+            : 'opacity-100 scale-100 top-[20%] md:top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2'
           }
         `}
       >
         <div className="text-center">
-          <h1 className="font-cursive text-6xl md:text-8xl lg:text-8xl xl:text-9xl text-gold whitespace-nowrap">
+          <h1 className="font-cursive text-4xl md:text-8xl lg:text-8xl xl:text-9xl text-gold whitespace-nowrap">
             Timavo
           </h1>
-          <div className="flex justify-center gap-2 mt-4">
+          <div className="flex justify-center gap-2">
             <span className="w-8 sm:w-12 h-px bg-gold"></span>
-            <span className="text-[10px] sm:text-xs tracking-[0.3em] text-cream font-light uppercase">
+            <span className="text-[8px] sm:text-xs tracking-[0.3em] text-cream font-light uppercase">
               Handcrafted Jewelry
             </span>
             <span className="w-8 sm:w-12 h-px bg-gold"></span>
