@@ -43,7 +43,13 @@ export async function POST(request: Request) {
       email,
       phone,
       socialUsername,
-      easypaisaNumber,
+      paymentMethod: body.paymentMethod || 'easypaisa',
+      easypaisaNumber: body.easypaisaNumber,
+      jazzcashNumber: body.jazzcashNumber,
+      bankName: body.bankName,
+      bankAccountName: body.bankAccountName,
+      bankAccountNumber: body.bankAccountNumber,
+      bankIBAN: body.bankIBAN,
       status: 'pending',
     });
     

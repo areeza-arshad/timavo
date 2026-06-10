@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const discountPercent = body.discountPercent || 0;
 
     const codTax = body.codTax || 0;
-    const paymentType = body.paymentType || 'half_advance';
+    const paymentType = body.paymentType|| 'half_advance';
     
     const order = await Order.create({
       orderNumber,
@@ -78,6 +78,7 @@ export async function POST(request: Request) {
       advanceAmount: body.advanceAmount,
       remainingAmount: body.remainingAmount,
       paymentMethod: body.paymentMethod,
+      customerPaymentType: body.customerPaymentType, 
       transactionId: body.transactionId,
       paymentScreenshot: body.paymentScreenshot,
       referralCode: body.referralCode,

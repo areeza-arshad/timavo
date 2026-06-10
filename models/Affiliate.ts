@@ -17,7 +17,29 @@ const AffiliateSchema = new mongoose.Schema({
   socialUsername: { 
     type: String 
   },
+
+  paymentMethod: { 
+    type: String, 
+    enum: ['easypaisa', 'jazzcash', 'bank_transfer'], 
+    default: 'easypaisa' 
+  },
   easypaisaNumber: { 
+    type: String 
+  },
+  jazzcashNumber: { 
+    type: String 
+  },
+
+  bankName: { 
+    type: String 
+  },
+  bankAccountName: { 
+    type: String 
+  },
+  bankAccountNumber: { 
+    type: String 
+  },
+  bankIBAN: { 
     type: String 
   },
   referralCode: { 

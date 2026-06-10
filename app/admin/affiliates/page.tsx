@@ -25,7 +25,13 @@ interface Affiliate {
   email: string;
   phone: string;
   socialUsername?: string;
+  paymentMethod?: string;    
   easypaisaNumber?: string;
+  jazzcashNumber?: string;   
+  bankName?: string;         
+  bankAccountName?: string;  
+  bankAccountNumber?: string;
+  bankIBAN?: string;         
   referralCode?: string;
   commissionRate: number;
   status: string;
@@ -370,6 +376,7 @@ export default function AdminAffiliates() {
             </div>
 
             <div className="p-6">
+              {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
@@ -394,13 +401,6 @@ export default function AdminAffiliates() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
-                    <CreditCardIcon className="h-4 w-4" />
-                    EasyPaisa
-                  </div>
-                  <p className="text-dark font-medium">{selectedAffiliate.easypaisaNumber || '-'}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
                     <HashIcon className="h-4 w-4" />
                     Referral Code
                   </div>
@@ -415,8 +415,61 @@ export default function AdminAffiliates() {
                   </div>
                   <p className="text-dark font-medium">{selectedAffiliate.commissionRate}%</p>
                 </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
+                    <CreditCardIcon className="h-4 w-4" />
+                    Payment Method
+                  </div>
+                  <p className="text-dark font-medium capitalize">
+                    {selectedAffiliate.paymentMethod || 'Not specified'}
+                  </p>
+                </div>
               </div>
 
+              {/* Payment Details Section - Dynamic based on payment method */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {/* EasyPaisa Details */}
+                {selectedAffiliate.paymentMethod === 'easypaisa' && selectedAffiliate.easypaisaNumber && (
+                  <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
+                    <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
+                      <CreditCardIcon className="h-4 w-4" />
+                      EasyPaisa Account
+                    </div>
+                    <p className="text-dark font-medium">{selectedAffiliate.easypaisaNumber}</p>
+                  </div>
+                )}
+
+                {/* JazzCash Details */}
+                {selectedAffiliate.paymentMethod === 'jazzcash' && selectedAffiliate.jazzcashNumber && (
+                  <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
+                    <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
+                      <CreditCardIcon className="h-4 w-4" />
+                      JazzCash Account
+                    </div>
+                    <p className="text-dark font-medium">{selectedAffiliate.jazzcashNumber}</p>
+                  </div>
+                )}
+
+                {/* Bank Transfer Details */}
+                {selectedAffiliate.paymentMethod === 'bank_transfer' && (
+                  <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
+                    <div className="flex items-center gap-2 text-charcoal text-sm mb-2">
+                      <CreditCardIcon className="h-4 w-4" />
+                      Bank Account Details
+                    </div>
+                    <div className="space-y-1 text-sm mt-2">
+                      <p><span className="text-charcoal/60">Bank Name:</span> {selectedAffiliate.bankName || '-'}</p>
+                      <p><span className="text-charcoal/60">Account Holder:</span> {selectedAffiliate.bankAccountName || '-'}</p>
+                      <p><span className="text-charcoal/60">Account Number:</span> {selectedAffiliate.bankAccountNumber || '-'}</p>
+                      {selectedAffiliate.bankIBAN && (
+                        <p><span className="text-charcoal/60">IBAN:</span> {selectedAffiliate.bankIBAN}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Earnings Summary */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-gradient-to-r from-gold/10 to-gold/5 rounded-lg p-4 text-center">
                   <p className="text-charcoal text-sm">Total Sales</p>
@@ -435,10 +488,11 @@ export default function AdminAffiliates() {
                   </p>
                 </div>
               </div>
+
               {/* Commission History */}
               <h3 className="font-serif text-lg mb-3">Commission History</h3>
 
-              {/* Desktop Table View - Hidden on mobile */}
+              {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="border-b bg-gray-50">
@@ -497,7 +551,7 @@ export default function AdminAffiliates() {
                 </table>
               </div>
 
-              {/* Mobile Card View - Visible only on mobile */}
+              {/* Mobile Card View */}
               <div className="md:hidden space-y-3">
                 {commissions.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 bg-white rounded-lg">

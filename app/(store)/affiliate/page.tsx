@@ -12,7 +12,13 @@ export default function AffiliatePage() {
     email: '',
     phone: '',
     socialUsername: '',
+    paymentMethod: 'easypaisa',
     easypaisaNumber: '',
+    jazzcashNumber: '',
+    bankAccountName: '',
+    bankAccountNumber: '',
+    bankIBAN: '',
+    bankName: '',
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -59,7 +65,7 @@ export default function AffiliatePage() {
           <h2 className="text-2xl font-serif mb-3">Application Submitted!</h2>
           <p className="text-charcoal mb-6">
             Thank you for your interest in Timavo Affiliate Program. Our team will review your application 
-            and contact you within 5-7 business days.
+            and please check your spam/junk folder for approve email
           </p>
           <button
             onClick={() => router.push('/')}
@@ -142,18 +148,119 @@ export default function AffiliatePage() {
                   placeholder="@username"
                 />
               </div>
-              
+
+              {/*Payment Method Selection */}
               <div>
-                <label className="block text-sm text-charcoal mb-1">EasyPaisa Number</label>
-                <input
-                  type="tel"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
-                  value={formData.easypaisaNumber}
-                  onChange={(e) => setFormData({ ...formData, easypaisaNumber: e.target.value })}
-                  placeholder="03XXXXXXXXX"
-                />
+                <label className="block text-sm font-medium text-charcoal mb-2">Payment Method</label>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="easypaisa"
+                      checked={formData.paymentMethod === 'easypaisa'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      className="text-gold"
+                    />
+                    <span className="text-sm">EasyPaisa</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="jazzcash"
+                      checked={formData.paymentMethod === 'jazzcash'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      className="text-gold"
+                    />
+                    <span className="text-sm">JazzCash</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="bank_transfer"
+                      checked={formData.paymentMethod === 'bank_transfer'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      className="text-gold"
+                    />
+                    <span className="text-sm">Bank Transfer</span>
+                  </label>
+                </div>
               </div>
+
+              {formData.paymentMethod === 'easypaisa' && (
+                <div>
+                  <label className="block text-sm text-charcoal mb-1">EasyPaisa Number</label>
+                  <input
+                    type="tel"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                    value={formData.easypaisaNumber}
+                    onChange={(e) => setFormData({ ...formData, easypaisaNumber: e.target.value })}
+                    placeholder="03XXXXXXXXX"
+                  />
+                </div>
+              )}
+
+              {formData.paymentMethod === 'jazzcash' && (
+                <div>
+                  <label className="block text-sm text-charcoal mb-1">JazzCash Number</label>
+                  <input
+                    type="tel"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                    value={formData.jazzcashNumber}
+                    onChange={(e) => setFormData({ ...formData, jazzcashNumber: e.target.value })}
+                    placeholder="03XXXXXXXXX"
+                  />
+                </div>
+              )}
+
+              {formData.paymentMethod === 'bank_transfer' && (
+                <div className="space-y-3 border-t pt-3">
+                  <p className="text-xs text-gold font-medium">Enter Your Bank Account Details</p>
+                  <div>
+                    <label className="block text-sm text-charcoal mb-1">Bank Name</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                      value={formData.bankName}
+                      onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-charcoal mb-1">Account Name</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                      value={formData.bankAccountName}
+                      onChange={(e) => setFormData({ ...formData, bankAccountName: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-charcoal mb-1">Account Number</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                      value={formData.bankAccountNumber}
+                      onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-charcoal mb-1">IBAN (Optional)</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-gold outline-none"
+                      value={formData.bankIBAN}
+                      onChange={(e) => setFormData({ ...formData, bankIBAN: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
               
               <button
                 type="submit"
@@ -165,7 +272,7 @@ export default function AffiliatePage() {
             </form>
           </motion.div>
 
-          {/* Commission Info */}
+          {/* Commission Info - Same as before */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -173,7 +280,6 @@ export default function AffiliatePage() {
           >
             <div className="bg-rose/30 rounded-2xl p-6">
               <h2 className="text-2xl font-serif mb-4">Commission Structure</h2>
-              {/* WILL CHANGE THIS LATER */}  
               <div className="text-5xl font-cursive text-gold mb-2">9%</div>
               <p className="text-charcoal">on every successful sale you refer</p>
             </div>
@@ -228,14 +334,6 @@ export default function AffiliatePage() {
                     </svg>
                   </div>
                   <span>Earn commission on every sale</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-gold/10 rounded-full flex items-center justify-center">
-                    <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
-                  <span>Get paid directly to your EasyPaisa account</span>
                 </li>
               </ul>
             </div>

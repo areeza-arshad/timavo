@@ -36,6 +36,7 @@ interface Order {
   paymentMethod: string;
   paymentStatus: string;
   paymentType?: string;
+  customerPaymentType?: string;
   orderNote?: string;
   createdAt: string;
 }
@@ -82,7 +83,7 @@ function OrderConfirmationContent() {
       if (res.ok) {
         const data = await res.json();
         setOrder(data);
-        console.log('📦 Order Data:', {
+        console.log('Order Data:', {
           originalSubtotal: data.originalSubtotal,
           subtotal: data.subtotal,
           discountAmount: data.discountAmount,
@@ -249,9 +250,27 @@ function OrderConfirmationContent() {
               <h3 className="text-xs font-serif font-medium text-dark uppercase tracking-wider mb-2">Shipping method</h3>
               <p className="text-xs text-charcoal">Standard Shipping (5-7 business days)</p>
             </div>
+
             <div>
               <h3 className="text-xs font-serif font-medium text-dark uppercase tracking-wider mb-2">Payment method</h3>
-              <p className="text-xs text-charcoal mt-1">Advance: 50% ({order.paymentMethod})</p>
+              
+              <p className="text-xs text-charcoal mt-1">
+                {order.paymentType === 'full_advance' 
+                  ? '100% Advance Payment'
+                  : '50% Advance + 50% Cash on Delivery'
+                }
+                {order.paymentType !== 'full_advance' && order.paymentMethod !== 'bank_transfer' && order.customerPaymentType && (
+                  <> ({order.customerPaymentType === 'jazzcash' ? 'JazzCash' : 'EasyPaisa'})</>
+                )}
+                {order.paymentMethod === 'bank_transfer' && ' (Bank Transfer)'}
+              </p>
+              
+              {order.paymentMethod !== 'bank_transfer' && order.customerPaymentType && order.paymentType !== 'full_advance' && (
+                <p className="text-xs text-gold mt-1">
+                  Paid via: {order.customerPaymentType === 'easypaisa' ? 'EasyPaisa' : 'JazzCash'}
+                </p>
+              )}
+              
               <p className="text-xs md:text-sm text-gold mt-1">PKR {order.totalAmount?.toLocaleString()}</p>
             </div>
             <div>

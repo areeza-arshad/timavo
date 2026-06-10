@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'easypaisa' | 'bank_transfer'>('easypaisa');
   const [paymentType, setPaymentType] = useState<'full_advance' | 'half_advance'>('half_advance');
+  const [customerPaymentType, setCustomerPaymentType] = useState<'easypaisa' | 'jazzcash'>('easypaisa');
   const [transactionId, setTransactionId] = useState('');
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState('');
@@ -57,6 +58,12 @@ export default function CheckoutPage() {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (paymentMethod === 'bank_transfer') {
+      setCustomerPaymentType('easypaisa'); 
+    }
+  }, [paymentMethod]);
 
   useEffect(() => {
     if (isHydrated && items.length === 0 && !orderPlaced) {
@@ -206,6 +213,7 @@ export default function CheckoutPage() {
       remainingAmount: remainingAmount,
       paymentMethod: paymentMethod,
       paymentType: paymentType,
+      customerPaymentType: paymentMethod === 'easypaisa' ? customerPaymentType : undefined,
       transactionId: paymentMethod === 'easypaisa' ? transactionId : undefined,
       paymentScreenshot: screenshotUrl || undefined,
       referralCode: referralCode || undefined,
@@ -415,7 +423,7 @@ export default function CheckoutPage() {
                       onChange={() => setPaymentMethod('easypaisa')}
                       className="text-gold"
                     />
-                    <span>Easypaisa</span>
+                    <span>Easypaisa/Jazzcash</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
@@ -431,11 +439,13 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Details based on method */}
-              {paymentMethod === 'easypaisa' && (
+              {/* {paymentMethod === 'easypaisa' && (
                 <div className="bg-gold/5 p-4 space-y-3 rounded-lg">
-                  <p className="font-medium">Easypaisa Account Details:</p>
-                  <p className="text-sm">Account Title: Hafiza Fatima Murtaza</p>
-                  <p className="text-sm">Account Number: 03328197729</p>
+                  <p className="font-medium">Account Details:</p>
+                  <p className="text-sm">Easypaisa Account Title: Hafiza Fatima Murtaza</p>
+                  <p className="text-sm">Easypaisa Number: 03328197729</p>
+                  <p className="text-sm border-t border-sand/30 pt-2">Jazzcash Account Title: Ghulam Murtaza</p>
+                  <p className="text-sm">Jazzcash Number: 03706806664</p>
                   <input
                     type="text"
                     placeholder="Transaction ID"
@@ -444,6 +454,96 @@ export default function CheckoutPage() {
                     onChange={(e) => setTransactionId(e.target.value)}
                     required
                   />
+                  <div className="mt-3">
+                    <label className="block text-sm text-charcoal mb-2">Upload Payment Screenshot *</label>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <label className="cursor-pointer bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm hover:border-gold transition">
+                        Choose File
+                        <input type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
+                      </label>
+                      {screenshotPreview ? (
+                        <div className="relative">
+                          <img src={screenshotPreview} alt="Preview" className="w-16 h-16 object-cover rounded-lg border" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setScreenshot(null);
+                              setScreenshotPreview('');
+                              setScreenshotError('');
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-red-500">No file chosen</div>
+                      )}
+                    </div>
+                    {screenshotError && <p className="text-xs text-red-500 mt-1">{screenshotError}</p>}
+                    <p className="text-xs text-charcoal mt-2">Required: Upload screenshot of payment (JPEG, PNG, max 5MB)</p>
+                  </div>
+                </div>
+              )} */}
+              {paymentMethod === 'easypaisa' && (
+                <div className="bg-gold/5 p-4 space-y-3 rounded-lg">
+                  <div>
+                    <label className="block text-sm font-medium text-charcoal mb-2">
+                      Select Your Payment Wallet
+                    </label>
+                    <div className="flex flex-wrap gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="customerPaymentType"
+                          value="easypaisa"
+                          checked={customerPaymentType === 'easypaisa'}
+                          onChange={(e) => setCustomerPaymentType(e.target.value as 'easypaisa')}
+                          className="text-gold"
+                        />
+                        <span className="text-sm">EasyPaisa</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="customerPaymentType"
+                          value="jazzcash"
+                          checked={customerPaymentType === 'jazzcash'}
+                          onChange={(e) => setCustomerPaymentType(e.target.value as 'jazzcash')}
+                          className="text-gold"
+                        />
+                        <span className="text-sm">JazzCash</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* EasyPaisa Details */}
+                  {customerPaymentType === 'easypaisa' && (
+                    <div className="border-b border-sand/30 pb-2">
+                      <p className="text-sm font-medium text-gold">EasyPaisa Account Details</p>
+                      <p className="text-sm">Account Title: Hafiza Fatima Murtaza</p>
+                      <p className="text-sm">Account Number: 03328197729</p>
+                    </div>
+                  )}
+
+                  {/* JazzCash Details */}
+                  {customerPaymentType === 'jazzcash' && (
+                    <div className="pb-2">
+                      <p className="text-sm font-medium text-gold">JazzCash Account Details</p>
+                      <p className="text-sm">Account Title: Ghulam Murtaza</p>
+                      <p className="text-sm">Account Number: 03706806664</p>
+                    </div>
+                  )}
+
+                  <input
+                    type="text"
+                    placeholder="Transaction ID"
+                    className="w-full px-4 py-2 outline-none border border-gray-200 rounded-lg"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    required
+                  />
+                  
                   <div className="mt-3">
                     <label className="block text-sm text-charcoal mb-2">Upload Payment Screenshot *</label>
                     <div className="flex items-center gap-4 flex-wrap">
@@ -523,7 +623,10 @@ export default function CheckoutPage() {
                       type="radio"
                       name="paymentType"
                       checked={paymentType === 'full_advance'}
-                      onChange={() => setPaymentType('full_advance')}
+                      onChange={() => {
+                        console.log('🔍 User selected: full_advance');
+                        setPaymentType('full_advance');
+                      }}
                       className="mt-1 text-gold"
                     />
                     <div>

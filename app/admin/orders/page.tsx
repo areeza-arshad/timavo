@@ -25,6 +25,7 @@ interface Order {
   remainingAmount: number;
   paymentMethod: string;
   paymentStatus: string;
+  customerPaymentType?: string;
   transactionId?: string;
   paymentScreenshot?: string;
   referralCode?: string;
@@ -282,8 +283,18 @@ export default function AdminOrders() {
                 </div>
                 <div>
                   <p className="text-xs text-charcoal uppercase tracking-wide">Payment Method</p>
-                  <p className="text-sm text-dark mt-1 capitalize">{selectedOrder.paymentMethod}</p>
+                  <p className="text-sm text-dark mt-1 capitalize">
+                    {selectedOrder.paymentMethod === 'easypaisa' ? 'EasyPaisa/JazzCash' : 'Bank Transfer'}
+                  </p>
                 </div>
+                {selectedOrder.paymentMethod === 'easypaisa' && selectedOrder.customerPaymentType && (
+                  <div>
+                    <p className="text-xs text-charcoal uppercase tracking-wide">Paid Via</p>
+                    <p className="text-sm text-dark mt-1 capitalize">
+                      {selectedOrder.customerPaymentType === 'easypaisa' ? 'EasyPaisa' : 'JazzCash'}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <p className="text-xs text-charcoal uppercase tracking-wide">Payment Status</p>
                   <div className="flex items-center gap-2 mt-1">

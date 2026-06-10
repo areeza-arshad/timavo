@@ -44,6 +44,17 @@ const OrderSchema = new mongoose.Schema({
   },
   transactionId: { type: String },
   paymentScreenshot: { type: String },
+  paymentType: { 
+    type: String, 
+    enum: ['full_advance', 'half_advance'],
+    default: 'half_advance'
+  },
+
+  customerPaymentType: { 
+    type: String, 
+    enum: ['easypaisa', 'jazzcash'],
+    default: 'easypaisa'
+  },
   
   referralCode: { type: String },
   affiliateId: { 
