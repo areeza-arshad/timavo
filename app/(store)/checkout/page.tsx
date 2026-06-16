@@ -537,11 +537,10 @@ export default function CheckoutPage() {
 
                   <input
                     type="text"
-                    placeholder="Transaction ID"
+                    placeholder="Transaction ID (Optional)"
                     className="w-full px-4 py-2 outline-none border border-gray-200 rounded-lg"
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
-                    required
                   />
                   
                   <div className="mt-3">
