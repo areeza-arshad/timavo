@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import SimpleAnimatedLogo from '@/components/SimpleAnimatedLogo';
 import { Toaster } from 'react-hot-toast';
 import CartCleaner from '@/components/CartCleaner';
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: 'Timavo - Find handcrafted Jewelry',
@@ -25,6 +26,7 @@ export default function RootLayout({
         <Footer />
         <Toaster position="top-center" />
         <CartCleaner/>
+        <Analytics/>
       </body>
     </html>
   );
