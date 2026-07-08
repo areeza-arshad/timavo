@@ -6,6 +6,7 @@ import SimpleAnimatedLogo from '@/components/SimpleAnimatedLogo';
 import { Toaster } from 'react-hot-toast';
 import CartCleaner from '@/components/CartCleaner';
 import { Analytics } from "@vercel/analytics/next";
+import ImageOptimizer from '@/components/ImageOptimizer';
 
 export const metadata: Metadata = {
   title: 'Timavo - Find handcrafted Jewelry',
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-cream">
+        <ImageOptimizer/>
         <SimpleAnimatedLogo />
         <Navbar />
         <main className="min-h-screen pt-0">{children}</main>

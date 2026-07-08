@@ -108,7 +108,7 @@ export default function AdminProducts() {
     setVariants(updatedVariants);
   };
 
-  const uploadVariantImage = async (variantIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadVariantImage = async (variantIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -135,7 +135,7 @@ export default function AdminProducts() {
       setUploadingVariantImage(null);
     }
   };
-
+   
   const removeVariantImage = (variantIndex: number, imageIndex: number) => {
     const updatedVariants = [...variants];
     updatedVariants[variantIndex].images = updatedVariants[variantIndex].images.filter((_, i) => i !== imageIndex);
