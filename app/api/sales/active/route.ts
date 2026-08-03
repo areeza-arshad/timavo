@@ -1,3 +1,4 @@
+// app/api/sales/active/route.ts
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Sale from '@/models/Sale';
@@ -13,8 +14,31 @@ export async function GET() {
       endDate: { $gte: now }
     });
     
-    return NextResponse.json(activeSales);
+    //CORS headers
+    return NextResponse.json(activeSales, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
   } catch (error) {
-    return NextResponse.json([], { status: 500 });
+    console.error('Error fetching active sales:', error);
+    return NextResponse.json([], { 
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
