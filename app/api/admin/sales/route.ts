@@ -74,19 +74,28 @@ export async function POST(request: Request) {
     const startDate = new Date(body.startDate);
     const endDate = new Date(body.endDate);
     
-    // Ensure dates are in Pakistan time (UTC+5)
-    const startDatePK = new Date(startDate.getTime() + PAKISTAN_OFFSET);
-    const endDatePK = new Date(endDate.getTime() + PAKISTAN_OFFSET);
-    
+    const PAKISTAN_OFFSET = 5 * 60 * 60 * 1000;
     const sale = await Sale.create({
       name: body.name,
       discountType: body.discountType,
       discountValue: body.discountValue,
       products: body.products,
-      startDate: startDatePK,
-      endDate: endDatePK,
-      isActive: body.isActive !== undefined ? body.isActive : true,
+      startDate: new Date(startDate.getTime() + PAKISTAN_OFFSET),
+      endDate: new Date(endDate.getTime() + PAKISTAN_OFFSET),
+      isActive: true
     });
+    // const startDatePK = new Date(startDate.getTime() + PAKISTAN_OFFSET);
+    // const endDatePK = new Date(endDate.getTime() + PAKISTAN_OFFSET);
+    
+    // const sale = await Sale.create({
+    //   name: body.name,
+    //   discountType: body.discountType,
+    //   discountValue: body.discountValue,
+    //   products: body.products,
+    //   startDate: startDatePK,
+    //   endDate: endDatePK,
+    //   isActive: body.isActive !== undefined ? body.isActive : true,
+    // });
     
     return NextResponse.json(sale, { 
       status: 201,
