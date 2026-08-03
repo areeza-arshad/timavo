@@ -40,6 +40,36 @@ export default function NewSalePage() {
     );
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+    
+  //   if (selectedProducts.length === 0) {
+  //     toast.error('Select at least one product');
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   const res = await fetch('/api/admin/sales', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       ...formData,
+  //       products: selectedProducts
+  //     }),
+  //   });
+
+  //   if (res.ok) {
+  //     toast.success('Sale created!');
+  //     router.push('/admin/sales');
+  //   } else {
+  //     toast.error('Failed to create sale');
+  //   }
+  //   setLoading(false);
+  // };
+
+  // app/admin/sales/new/page.tsx - In handleSubmit function
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -50,24 +80,40 @@ export default function NewSalePage() {
 
     setLoading(true);
 
-    const res = await fetch('/api/admin/sales', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formData,
-        products: selectedProducts
-      }),
-    });
+    // ✅ Fix: Ensure dates are in correct format
+    const startDate = new Date(formData.startDate);
+    const endDate = new Date(formData.endDate);
+    
+    // ✅ Convert to ISO string (API will handle time zone)
+    const saleData = {
+      name: formData.name,
+      discountType: formData.discountType,
+      discountValue: Number(formData.discountValue),
+      products: selectedProducts,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      isActive: true
+    };
 
-    if (res.ok) {
-      toast.success('Sale created!');
-      router.push('/admin/sales');
-    } else {
-      toast.error('Failed to create sale');
+    try {
+      const res = await fetch('/api/admin/sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(saleData),
+      });
+
+      if (res.ok) {
+        toast.success('Sale created successfully!');
+        router.push('/admin/sales');
+      } else {
+        toast.error('Failed to create sale');
+      }
+    } catch (error) {
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto">
       <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-dark">Create New Sale</h1>
