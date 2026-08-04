@@ -7,12 +7,15 @@ export async function GET() {
   try {
     await connectDB();
     const now = new Date();
+    const PAKISTAN_OFFSET = 5 * 60 * 60 * 1000;
+    const nowPK = new Date(now.getTime() + PAKISTAN_OFFSET);
     
     const activeSales = await Sale.find({
       isActive: true,
-      startDate: { $lte: now },
-      endDate: { $gte: now }
+      startDate: { $lte: nowPK },
+      endDate: { $gte: nowPK }
     });
+    
     
     //CORS headers
     return NextResponse.json(activeSales, {

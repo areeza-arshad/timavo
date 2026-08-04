@@ -40,36 +40,6 @@ export default function NewSalePage() {
     );
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-    
-  //   if (selectedProducts.length === 0) {
-  //     toast.error('Select at least one product');
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   const res = await fetch('/api/admin/sales', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       ...formData,
-  //       products: selectedProducts
-  //     }),
-  //   });
-
-  //   if (res.ok) {
-  //     toast.success('Sale created!');
-  //     router.push('/admin/sales');
-  //   } else {
-  //     toast.error('Failed to create sale');
-  //   }
-  //   setLoading(false);
-  // };
-
-  // app/admin/sales/new/page.tsx - In handleSubmit function
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -80,11 +50,9 @@ export default function NewSalePage() {
 
     setLoading(true);
 
-    // ✅ Fix: Ensure dates are in correct format
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
-    
-    // ✅ Convert to ISO string (API will handle time zone)
+
     const saleData = {
       name: formData.name,
       discountType: formData.discountType,
