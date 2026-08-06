@@ -697,7 +697,7 @@ export default function CheckoutPage() {
                       <span>{item.name} x {item.quantity}</span>
                       {item.selectedSize && <p className="text-xs text-gold">Size: {item.selectedSize}</p>}
                     </div>
-                    <span>PKR {(item.price * item.quantity).toFixed(2)}</span>
+                    <span>PKR {(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -713,13 +713,13 @@ export default function CheckoutPage() {
                 {isReferralValid && (
                   <div className="flex justify-between text-sm text-gray-400 line-through">
                     <span>Original Total</span>
-                    <span>PKR {originalTotal.toFixed(2)}</span>
+                    <span>PKR {originalTotal.toLocaleString()}</span>
                   </div>
                 )}
                 
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>PKR {discountedSubtotal.toFixed(2)}</span>
+                  <span>PKR {discountedSubtotal.toLocaleString()}</span>
                 </div>
                 
                 {isReferralValid && discountAmount > 0 && (
@@ -743,7 +743,7 @@ export default function CheckoutPage() {
                 
                 <div className="flex justify-between pt-2 border-t border-sand/20">
                   <span>Total</span>
-                  <span>PKR {totalWithTax.toFixed(2)}</span>
+                  <span>PKR {Math.round(totalWithTax).toLocaleString()}</span>
                 </div>
                 
                 <div className="flex justify-between font-medium text-sm pt-2">

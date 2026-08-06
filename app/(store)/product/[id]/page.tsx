@@ -13,6 +13,13 @@ interface Variant {
   price?: number;
 }
 
+interface ActiveSale {
+  _id: string;
+  discountType: string;
+  discountValue: number;
+  products: string[];
+}
+
 interface Product {
   _id: string;
   name: string;
@@ -41,11 +48,14 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState('');
+  const [activeSale, setActiveSale] = useState<ActiveSale | null>(null);
   const addItem = useCartStore((state) => state.addItem);
+  
 
   useEffect(() => {
     if (id) {
       fetchProduct();
+      fetchActiveSale();
     }
   }, [id]);
 
@@ -67,9 +77,45 @@ export default function ProductDetailPage() {
     }
   };
 
+  const fetchActiveSale = async () => {
+    try {
+      const res = await fetch('/api/sales/active');
+      const data = await res.json();
+      if (data && data.length > 0) {
+        // Check if this product is in any active sale
+        for (const sale of data) {
+          if (sale.products.includes(id)) {
+            setActiveSale(sale);
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching sale:', error);
+    }
+  };
+
+  // const getCurrentPrice = () => {
+  //   if (selectedVariant?.price) return selectedVariant.price;
+  //   return product?.price || 0;
+  // };
+
   const getCurrentPrice = () => {
-    if (selectedVariant?.price) return selectedVariant.price;
-    return product?.price || 0;
+    let basePrice = selectedVariant?.price || product?.price || 0;
+    
+    // ✅ Apply sale discount if product is on sale
+    if (activeSale) {
+      if (activeSale.discountType === 'percentage') {
+        return basePrice - (basePrice * activeSale.discountValue / 100);
+      } else {
+        return basePrice - activeSale.discountValue;
+      }
+    }
+    return basePrice;
+  };
+
+  const getOriginalPrice = () => {
+    return selectedVariant?.price || product?.price || 0;
   };
 
   const getCurrentImage = () => {
@@ -165,7 +211,10 @@ export default function ProductDetailPage() {
   const currentImage = getCurrentImage();
   const currentPrice = getCurrentPrice();
   const currentStock = getCurrentStock();
+  const originalPrice = getOriginalPrice();
+  const isOnSale = activeSale !== null;
   const isSoldOut = currentStock === 0;
+
 
   const allThumbnails = (() => {
     if (product.variants && product.variants.length > 0) {
@@ -247,9 +296,21 @@ export default function ProductDetailPage() {
               animate={{ opacity: 1, x: 0 }}
               className='md:mr-4'
             >
-              <div className="flex gap-2 mb-4">
+              {/* <div className="flex gap-2 mb-4">
                 {product.isSale && (
                   <span className="bg-dark text-white px-2 py-0.5 text-xs rounded">Sale</span>
+                )}
+                {isSoldOut && (
+                  <span className="bg-gold text-dark px-2 py-0.5 text-xs rounded">Sold Out</span>
+                )}
+              </div> */}
+              <div className="flex gap-2 mb-4">
+                {isOnSale && (
+                  <span className="bg-red-500 text-white px-2 py-0.5 text-xs rounded">
+                    {activeSale.discountType === 'percentage' 
+                      ? `${activeSale.discountValue}% OFF` 
+                      : `PKR ${activeSale.discountValue} OFF`}
+                  </span>
                 )}
                 {isSoldOut && (
                   <span className="bg-gold text-dark px-2 py-0.5 text-xs rounded">Sold Out</span>
@@ -258,13 +319,22 @@ export default function ProductDetailPage() {
 
               <h1 className="text-4xl font-serif mb-4">{product.name}</h1>
               
-              <div className="flex items-center gap-3 mb-6">
+              {/* <div className="flex items-center gap-3 mb-6">
                 {product.originalPrice && !selectedVariant?.price && (
                   <span className="text-xl text-charcoal line-through">
                     PKR {product.originalPrice}
                   </span>
                 )}
                 <p className="text-3xl text-gold">PKR {currentPrice}</p>
+              </div> */}
+              
+              <div className="flex items-center gap-3 mb-6">
+                {isOnSale && originalPrice > currentPrice && (
+                  <span className="text-xl text-charcoal line-through">
+                    PKR {Math.round(originalPrice).toLocaleString()}
+                  </span>
+                )}
+                <p className="text-3xl text-gold">PKR {Math.round(currentPrice).toLocaleString()}</p>
               </div>
               
               <div className="text-sm mb-6">
