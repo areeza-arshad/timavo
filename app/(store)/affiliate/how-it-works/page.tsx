@@ -62,11 +62,6 @@ export default function HowItWorksPage() {
 
   const benefits = [
     {
-      icon: <UsersIcon className="h-6 w-6" />,
-      title: 'No Cost to Join',
-      description: 'Free to join, no hidden fees'
-    },
-    {
       icon: <GiftIcon className="h-6 w-6" />,
       title: 'EasyPaisa Payouts',
       description: 'Get paid directly to your EasyPaisa account'
@@ -80,6 +75,11 @@ export default function HowItWorksPage() {
       icon: <CheckCircleIcon className="h-6 w-6" />,
       title: 'Real-time Tracking',
       description: 'Track earnings in your dashboard'
+    },
+    {
+      icon: <UsersIcon className="h-6 w-6" />,
+      title: 'For more details',
+      description: 'Contact: 03328197729'
     }
   ];
 
