@@ -432,6 +432,7 @@ export default function FeaturedProducts({ products, loading = false }: Featured
           </div>
         </div>
       </section>
+      
 
       {/* Modal */}
       <AnimatePresence>
